@@ -1,0 +1,58 @@
+<html>
+<head>
+	<script src="https://unpkg.com/vue"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Poiret One" rel="stylesheet" type="text/css">
+	
+	<style>
+	
+	* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+.bloc {
+	margin: 3px;
+	padding: 10px;
+	font-family: 'Poiret One', sans-serif;
+	font-size: 28px;
+	font-weight: bold;
+}
+	
+	</style>
+	
+</head>
+
+<div id="app">
+  <p>{{ message }}</p>
+   <div v-for="notification in notifications" class="notification">
+   	<i class="fa fa-times"></i>
+    {{ notification.message }}
+  </div>
+</div>
+
+<script>
+
+new Vue({
+	  el: '#app',
+	  data: {
+	    message: 'Hello Vue.j456456s!',
+	    notifications: [
+	    	{
+	    		message:"Ceci est la notification 1",
+	    		url: "url1"
+	    	},
+	    	{
+	    		message:"Ceci est la notification 2",
+	    		url: "url2"
+	    	},
+	    	{
+	    		message:"Ceci est la notification 3",
+	    		url: "url3"
+	    	}
+	    ] 
+	  }
+	})
+
+</script>
+</html>
