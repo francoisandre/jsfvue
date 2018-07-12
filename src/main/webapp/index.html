@@ -3,6 +3,7 @@
 	<script src="https://unpkg.com/vue"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<link href="https://fonts.googleapis.com/css?family=Poiret One" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	
 	<style>
 	
@@ -11,24 +12,80 @@
 	padding: 0;
 	margin: 0;
 }
-.bloc {
-	margin: 3px;
-	padding: 10px;
-	font-family: 'Poiret One', sans-serif;
-	font-size: 28px;
-	font-weight: bold;
+
+.alertes {
+	margin: 10px;
+	padding: 5px;
+	border-left: red 3px solid;
+	font-size: 18px;
+	font-family: 'Roboto', sans-serif;
+	width:350px;
 }
+
+.alertes header {
+	color: red;
+	font-weight:bold;
+}
+
+.alertes section {
+	background: #f6f6f6;
+	padding: 10px;
+}
+
+.alertes article nav li {
+	border-right: grey 1px solid;
+	display: inline;
+	padding-right:3px;
+    margin-right:3px;
+    cursor: pointer;
+}
+
+.alertes article nav {
+	text-align: right;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+.alertes article nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+} 
+
+.important {
+	color: red;
+}
+
+.padding-left3px {
+	padding-left:3px;
+}
+
 	
 	</style>
 	
 </head>
 
-<div id="app">
-  <p>{{ message }}</p>
-   <div v-for="notification in notifications" class="notification">
-   	<i class="fa fa-times"></i>
+<div class="alertes" id="app" > 
+<header>Vos alertes</header>
+<section >
+   <article v-for="notification in notifications" class="notification">
     {{ notification.message }}
-  </div>
+    <nav>
+    	<ul>
+    		<li v-on:click="supprimer(notification.id)" class="important">Supprimer<i class="fa fa-times-circle-o padding-left3px" ></i></li>
+    		<li v-on:click="traiter(notification.id)">Traiter<i class="fa fa-arrow-circle-o-right padding-left3px"></i></li>
+    	</ul>
+    </nav>
+  </article>
+</section>
+<section>
+<li>
+	Voir toutes les alertes
+</li>
+<li>
+	Rafraichir
+</li>
+</section>
 </div>
 
 <script>
@@ -36,21 +93,32 @@
 new Vue({
 	  el: '#app',
 	  data: {
-	    message: 'Hello Vue.j456456s!',
+	    message: 'Hellxxxo Vue.j456456s!',
 	    notifications: [
 	    	{
 	    		message:"Ceci est la notification 1",
-	    		url: "url1"
+	    		url: "url1",
+	    		id:1
 	    	},
 	    	{
 	    		message:"Ceci est la notification 2",
-	    		url: "url2"
+	    		url: "url2",
+	    		id:2
 	    	},
 	    	{
 	    		message:"Ceci est la notification 3",
-	    		url: "url3"
+	    		url: "url3",
+	    		id:3
 	    	}
 	    ] 
+	  },
+	  methods: {
+		  traiter: function(i) {
+			  alert("Traiter "+i);
+		  },
+		  supprimer: function(i) {
+			  alert("Supprimer "+i);
+		  },
 	  }
 	})
 

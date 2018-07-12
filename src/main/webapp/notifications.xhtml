@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"      
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:v-on="http://xmlns.jcp.org/jsf/passthrough">
+      
+    <h:head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+	<script src="https://unpkg.com/vue"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
+	<link href="https://fonts.googleapis.com/css?family=Poiret One" rel="stylesheet" type="text/css"></link>
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"></link>
+	
+	<style>
+	
+	* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+.alertes {
+	margin: 10px;
+	padding: 5px;
+	border-left: red 3px solid;
+	font-size: 18px;
+	font-family: 'Roboto', sans-serif;
+	width:350px;
+}
+
+.alertes header {
+	color: red;
+	font-weight:bold;
+}
+
+.alertes section {
+	background: #f6f6f6;
+	padding: 10px;
+}
+
+.alertes nav li {
+	border-right: grey 1px solid;
+	display: inline;
+	padding-right:3px;
+    margin-right:3px;
+    cursor: pointer;
+}
+
+.alertes article nav {
+	text-align: right;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+.alertes  nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+} 
+
+.liens {
+	text-decoration: underline;
+}
+
+
+.important {
+	color: red;
+}
+
+.padding-left3px {
+	padding-left:3px;
+}
+
+.invisiblex {
+position: absolute;
+   top: -9999px;
+   left: -9999px;
+}
+	
+	</style>
+	
+</h:head>  
+	
+    <h:body>
+    
+    <div class="alertes" id="app" > 
+<header>Vos alertes</header>
+
+<section >
+<div v-if="hit==0">
+Aucune alerte.
+</div>	
+   <article v-for="notification in notifications" class="notification">
+    {{ notification.message }}
+    <nav>
+    	<ul>
+    		<li v-on:click="supprimer(notification.id)" class="important">Supprimer<i class="fa fa-times-circle-o padding-left3px" ></i>
+    		</li>
+    		<li v-on:click="traiter(notification.id)">Traiter<i class="fa fa-arrow-circle-o-right padding-left3px"></i></li>
+    	</ul>
+    </nav>
+  </article>
+</section>
+<section>
+<nav>
+<ul>
+    		<li v-on:click="nonImplemente()" class="liens">Voir toutes les alertes({{hit}})</li>
+    		<li v-on:click="rafraichir()" class="liens">Rafraichir</li>
+ </ul>
+</nav>
+</section>
+</div>
+  
+    
+    	<div class="invisible">
+    	<h:form>
+    		<h:inputText id="currentId" value="#{notificationsBean.currentId}"></h:inputText>
+    		<h:inputTextarea id="notificationsContent" value="#{notificationsBean.notificationsContent}"></h:inputTextarea>
+    		
+    		<h:commandButton id="deleteButton" value="Delete">
+    			 <f:ajax execute="currentId" listener="#{notificationsBean.deleteCurrent}" render="notificationsContent" onevent="notificationUpdated" />
+    		</h:commandButton>
+    		<h:commandButton id="refreshButton" value="Refresh">
+    			 <f:ajax execute="" listener="#{notificationsBean.refreshNotations}" render="notificationsContent" onevent="notificationUpdated" />
+    		</h:commandButton>
+    	</h:form>
+    	</div>
+	<script>
+	new Vue({
+		  el: '#app',
+		  data: {
+			notificationUpdateListener: null,
+			hit:0,
+		    notifications: [] 
+		  },
+		  methods: {
+			  traiter: function(i) {
+				  alert("Traiter "+i);
+			  },
+			  supprimer: function(i) {
+				  document.querySelector("input[id$='currentId']").value=i;
+				  document.querySelector("input[id$='deleteButton']").click();
+			  },
+			  rafraichir: function() {
+				  document.querySelector("textarea[id$='notificationsContent']").value=""
+				  document.querySelector("input[id$='refreshButton']").click();
+			  },
+			  nonImplemente: function() {
+				  alert("Non implémenté...mais ce n'est pas dur");
+			  },
+			  handleNotificationUpdate: function(e) {
+				  	this.hit=e.detail.hit;
+				  	this.notifications=e.detail.notifications;
+				  	sessionStorage.setItem("notificationDetail",JSON.stringify(e.detail))
+				}
+		  },
+		  
+		  created: function () {
+		  		this.notificationUpdateListener = this.handleNotificationUpdate.bind(this) 
+		   		document.addEventListener('notificationUpdateEvent', this.notificationUpdateListener);
+		  		var aux = sessionStorage.getItem("notificationDetail")
+		  		if (aux) {
+		  			detail = JSON.parse(aux)
+		  			this.hit=detail.hit;
+				  	this.notifications=detail.notifications;
+		  		}
+		  		else {
+		  			this.rafraichir()
+		  			
+		  		}
+		  },
+		  
+		   destroyed: function() {
+		  	document.removeEventListener('notificationUpdateEvent', this.notificationUpdateListener);
+		  	this.notificationUpdateListener = null;
+		  }
+		});
+	
+	
+	function notificationUpdated(e) {
+		if (e.status == "success") {
+			var textarea = document.querySelector("textarea[id$='notificationsContent']")
+			console.log(textarea.value)
+			obj = JSON.parse(textarea.value);
+			var event = new CustomEvent('notificationUpdateEvent', { detail: obj});
+	  		document.dispatchEvent(event);
+		}
+	}
+	
+	</script>
+
+
+	</h:body>
+</html>
